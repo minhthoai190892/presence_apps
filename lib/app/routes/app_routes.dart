@@ -1,3 +1,5 @@
+
+
 part of 'app_pages.dart';
 // DO NOT EDIT. This is code generated via package:get_cli/get_cli.dart
 
@@ -9,6 +11,8 @@ abstract class Routes {
   static const ADD_PEGAWAI = _Paths.ADD_PEGAWAI;
   // ignore: constant_identifier_names
   static const LOGIN_PEGAWAI = _Paths.LOGIN_PEGAWAI;
+  // ignore: constant_identifier_names
+  static const NEW_PASSWORD = _Paths.NEW_PASSWORD;
 }
 
 abstract class _Paths {
@@ -19,4 +23,6 @@ abstract class _Paths {
   static const ADD_PEGAWAI = '/add-pegawai';
   // ignore: constant_identifier_names
   static const LOGIN_PEGAWAI = '/login-pegawai';
+  // ignore: constant_identifier_names
+  static const NEW_PASSWORD = '/new-password';
 }

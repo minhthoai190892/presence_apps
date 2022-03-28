@@ -18,8 +18,10 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-                     TextFieldWidget(controller: controller.nipC, title: 'Nip',),
-
+          TextFieldWidget(
+            controller: controller.nipC,
+            title: 'Nip',
+          ),
           const SizedBox(
             height: 20,
           ),
