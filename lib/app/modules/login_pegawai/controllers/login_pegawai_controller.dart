@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presence_apps/app/routes/app_pages.dart';
 
@@ -17,20 +17,43 @@ class LoginPegawaiController extends GetxController {
           UserCredential userCredential = await auth.signInWithEmailAndPassword(
               email: emailC.text, password: passC.text);
 
-        
           //kiểm tra xác thực email
           if (userCredential.user != null) {
             if (userCredential.user!.emailVerified == true) {
-              Get.offAllNamed(Routes.HOME);
+              if (passC.text=="password") {
+                Get.offAllNamed(Routes.NEW_PASSWORD);
+              } else {
+                Get.offAllNamed(Routes.HOME);
+              }
+              
             } else {
               Get.defaultDialog(
                   title: "Not verified",
-                  middleText: " You haven't verified this account, please verify your email.");
+                  middleText:
+                      " You haven't verified this account, please verify your email.",
+                  actions: [
+                    OutlinedButton(
+                        onPressed: () => Get.back(), child: const Text("CANCEL")),
+                    //gửi xác thực email
+                    ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            await userCredential.user!.sendEmailVerification();
+                            Get.back();
+                            Get.snackbar("Success",
+                                "We have successfully sent a verification email to your account.");
+                          } catch (e) {
+                            Get.snackbar("Error",
+                                "Unable to send verification email. Contact admin or customer service.");
+                          }
+                        },
+                        child: const Text("RESENDING "))
+                  ]);
             }
           }
-            print("----------------------------");
-          
-            print(userCredential);
+          print("----------------------------");
+
+          print(userCredential);
         } on FirebaseAuthException catch (e) {
           if (e.code == 'user-not-found') {
             Get.snackbar("Error", "No user found for that email.");
