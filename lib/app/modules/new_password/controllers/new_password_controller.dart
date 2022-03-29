@@ -13,10 +13,12 @@ class NewPasswordController extends GetxController {
       if (newPassC.text != "password") {
         try {
           String email = auth.currentUser!.email!;
+          //update Password
           await auth.currentUser!.updatePassword(newPassC.text);
           print("------------------------------");
           print(email);
           await auth.signOut();
+          //đăng nhập với email và password
           await auth.signInWithEmailAndPassword(
               email: email, password: newPassC.text);
           Get.offAllNamed(Routes.HOME);

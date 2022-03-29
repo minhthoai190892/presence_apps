@@ -41,7 +41,7 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           ),
           ElevatedButton(
               onPressed: () {
-                controller.add();
+                controller.addPegawai();
               },
               child: const Text("ADD PEGAWAI")),
         ],
