@@ -39,11 +39,15 @@ class AddPegawaiView extends GetView<AddPegawaiController> {
           const SizedBox(
             height: 30,
           ),
-          ElevatedButton(
-              onPressed: () {
-                controller.addPegawai();
+          Obx(() => ElevatedButton(
+              onPressed: () async {
+                if (controller.isLoading.isFalse) {
+                  await controller.addPegawai();
+                }
               },
-              child: const Text("ADD PEGAWAI")),
+              child: controller.isLoading.isFalse
+                  ? const Text("ADD PEGAWAI")
+                  : const Text("Loading..."))),
         ],
       ),
     );

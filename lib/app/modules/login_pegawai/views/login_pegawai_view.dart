@@ -26,14 +26,19 @@ class LoginPegawaiView extends GetView<LoginPegawaiController> {
           const SizedBox(
             height: 30,
           ),
-          ElevatedButton(onPressed: () {
-            controller.login();
-          }, child: const Text("LOGIN")),
-          TextButton(
-              onPressed: () {
-                
+          Obx(
+            () => ElevatedButton(
+              onPressed: () async {
+                if (controller.isLoading.isFalse) {
+                  await controller.login();
+                }
               },
-              child: const Text("Forgot the password "))
+              child:
+                  Text(controller.isLoading.isFalse? "LOGIN" : "Loading..."),
+            ),
+          ),
+          TextButton(
+              onPressed: () {}, child: const Text("Forgot the password "))
         ],
       ),
     );

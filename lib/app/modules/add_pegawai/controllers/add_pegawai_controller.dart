@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:presence_apps/widgets/textfield_widget.dart';
 
 class AddPegawaiController extends GetxController {
+  RxBool isLoading = false.obs;
+  RxBool isLoadingAddPegawai = false.obs;
   TextEditingController nipC = TextEditingController();
   TextEditingController nameC = TextEditingController();
   TextEditingController emailC = TextEditingController();
@@ -15,7 +17,9 @@ class AddPegawaiController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   Future<void> prosesaddPegawai() async {
     // print("Add Pegawai");
+
     if (passAdminC.text.isNotEmpty) {
+      isLoadingAddPegawai.value = true;
       try {
         //kiem tra passwod
 
@@ -24,7 +28,7 @@ class AddPegawaiController extends GetxController {
             await auth.signInWithEmailAndPassword(
                 email: emailAdmin, password: passAdminC.text);
         print("===============================================");
-        print(emailAdmin);
+        print(userCredentialAdmin);
         UserCredential pegawaiCredential =
             await auth.createUserWithEmailAndPassword(
                 email: emailC.text, password: passAdminC.text);
@@ -54,7 +58,10 @@ class AddPegawaiController extends GetxController {
 
           print(userCredentialAdmin);
         }
+        isLoadingAddPegawai.value = false;
       } on FirebaseAuthException catch (e) {
+        isLoadingAddPegawai.value = false;
+
         if (e.code == 'weak-password') {
           Get.snackbar("Error", "The password provided is too weak.");
         } else if (e.code == 'email-already-in-use') {
@@ -65,43 +72,52 @@ class AddPegawaiController extends GetxController {
           Get.snackbar("Error", e.code);
         }
       } catch (e) {
+        isLoadingAddPegawai.value = false;
+
         Get.snackbar("Error", "Unable to add pegawai");
       }
     } else {
+      isLoading.value = false;
+
       Get.snackbar("Error", "Password can not blank!");
     }
   }
 
-  void addPegawai() async {
+  Future<void> addPegawai() async {
     if (nipC.text.isNotEmpty &&
         nameC.text.isNotEmpty &&
         emailC.text.isNotEmpty) {
       if (emailC.text.isEmail) {
+        isLoading.value = true;
         Get.defaultDialog(
             title: "Admin Validation ",
             content: Column(
               children: [
-                Text("Enter password for admin validation."),
-                // TextFieldWidget(controller: controller, title: title)
-                // TextField(
-                //   controller: passAdminC,
-                //   decoration: InputDecoration(
-                //     border: OutlineInputBorder(),
-                //     labelText: "Password",
-                //   ),
-                // ),
+                const Text("Enter password for admin validation."),
+                const SizedBox(
+                  height: 10,
+                ),
                 TextFieldWidget(controller: passAdminC, title: "Password")
               ],
             ),
             actions: [
               OutlinedButton(
-                  onPressed: () => Get.back(), child: const Text("CANCEL")),
-              ElevatedButton(
-                  onPressed: () async {Get.back();
-                    await prosesaddPegawai();
-                    
+                  onPressed: () {
+                    isLoading.value = false;
+                    Get.back();
                   },
-                  child: const Text("ADD PEGAWAI")),
+                  child: const Text("CANCEL")),
+              Obx(() => ElevatedButton(
+                  onPressed: () async {
+                    // Get.back();
+                    if (isLoadingAddPegawai.isFalse) {
+                      await prosesaddPegawai();
+                    }
+                    isLoading.value = false;
+                  },
+                  child: isLoadingAddPegawai.isFalse
+                      ? const Text("ADD PEGAWAI")
+                      : const Text("LOADING ..."))),
             ]);
       } else {
         Get.snackbar("Error", " Email Error!");

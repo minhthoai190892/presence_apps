@@ -6,13 +6,15 @@ import 'package:get/get.dart';
 import 'package:presence_apps/app/routes/app_pages.dart';
 
 class LoginPegawaiController extends GetxController {
+  RxBool isLoading = false.obs;
   TextEditingController emailC = TextEditingController();
   TextEditingController passC = TextEditingController();
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  void login() async {
+  Future<void> login() async {
     if (emailC.text.isNotEmpty && passC.text.isNotEmpty) {
       if (emailC.text.isEmail) {
+        isLoading.value = true;
         try {
           UserCredential userCredential = await auth.signInWithEmailAndPassword(
               email: emailC.text, password: passC.text);
@@ -20,12 +22,13 @@ class LoginPegawaiController extends GetxController {
           //kiểm tra xác thực email
           if (userCredential.user != null) {
             if (userCredential.user!.emailVerified == true) {
-              if (passC.text=="password") {
+              isLoading.value = false;
+
+              if (passC.text == "password") {
                 Get.offAllNamed(Routes.NEW_PASSWORD);
               } else {
                 Get.offAllNamed(Routes.HOME);
               }
-              
             } else {
               Get.defaultDialog(
                   title: "Not verified",
@@ -33,7 +36,11 @@ class LoginPegawaiController extends GetxController {
                       " You haven't verified this account, please verify your email.",
                   actions: [
                     OutlinedButton(
-                        onPressed: () => Get.back(), child: const Text("CANCEL")),
+                        onPressed: () {
+                          isLoading.value = false;
+                          Get.back();
+                        },
+                        child: const Text("CANCEL")),
                     //gửi xác thực email
                     ElevatedButton(
                         onPressed: () async {
@@ -42,7 +49,9 @@ class LoginPegawaiController extends GetxController {
                             Get.back();
                             Get.snackbar("Success",
                                 "We have successfully sent a verification email to your account.");
+                            isLoading.value = false;
                           } catch (e) {
+                            isLoading.value = false;
                             Get.snackbar("Error",
                                 "Unable to send verification email. Contact admin or customer service.");
                           }
@@ -52,7 +61,6 @@ class LoginPegawaiController extends GetxController {
             }
           }
           print("----------------------------");
-
           print(userCredential);
         } on FirebaseAuthException catch (e) {
           if (e.code == 'user-not-found') {
